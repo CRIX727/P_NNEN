@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  NUTRICIONISTA
+  PACIENTE
+}
+
+enum AppointmentStatus {
+  AGENDADA
+  REPROGRAMADA
+  COMPLETADA
+  CANCELADA
+}
+
+enum PaymentStatus {
+  PENDIENTE
+  PAGADO
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  nombre            String
+  correo            String    @unique
+  passwordHash      String
+  rol               UserRole
+  refreshTokenHash  String?
+  precioConsulta    Float?    @default(0)
+  whatsapp          String?   @default("")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  patients          Patient[]
+}
+
+model Patient {
+  id               Int       @id @default(autoincrement())
+  nombre           String
+  correo           String
+  nutricionistaId   Int
+  peso             Float     @default(0)
+  altura           Float     @default(0)
+  grasaCorporal    Float     @default(0)
+  alergias         String    @default("")
+  enfermedades     String    @default("")
+  edad             Int       @default(30)
+  sexo             String    @default("Femenino")
+  factorActividad  Float     @default(1.2)
+  telefono         String    @default("")
+  notas            String    @default("")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  evaluations      Evaluation[]
+  plans            Plan[]
+  appointments     Appointment[]
+  messages         Message[]
+  payments         Payment[]
+  documents        Document[]
+  nutricionista    User      @relation(fields: [nutricionistaId], references: [id], onDelete: Cascade)
+}
+
+model Evaluation {
+  id          Int      @id @default(autoincrement())
+  pacienteId  Int
+  peso        Float
+  altura      Float
+  imc         Float
+  tmb         Float     @default(0)
+  get         Float     @default(0)
+  grasa       Float
+  fecha       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  patient     Patient   @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id              Int      @id @default(autoincrement())
+  pacienteId      Int
+  titulo          String   @default("Plan general")
+  descripcion     String
+  objetivo        String   @default("")
+  condicion       String   @default("")
+  plantillaNombre String   @default("")
+  fechaInicio     String
+  fechaFin        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  patient         Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id                  Int               @id @default(autoincrement())
+  pacienteId          Int
+  fecha               String
+  motivo              String
+  estado              AppointmentStatus @default(AGENDADA)
+  canalRecordatorio   String           @default("WhatsApp y email")
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  patient             Patient          @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  pacienteId Int
+  remitente  String
+  contenido  String
+  fecha      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  patient    Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id         Int           @id @default(autoincrement())
+  pacienteId Int
+  monto      Float
+  concepto   String
+  fecha      String
+  estado     PaymentStatus @default(PENDIENTE)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  patient    Patient       @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id         Int      @id @default(autoincrement())
+  pacienteId Int
+  nombre     String
+  tipo       String
+  uri        String
+  fecha      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  patient    Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+model PlanTemplate {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  objetivo    String
+  condicion   String
+  descripcion String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
