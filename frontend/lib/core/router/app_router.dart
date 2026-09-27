@@ -5,9 +5,9 @@ import '../../domain/entities/user_role.dart';
 import '../../presentation/auth/auth_state.dart';
 import '../../presentation/auth/login_screen.dart';
 import '../../presentation/auth/register_screen.dart';
-import '../../presentation/home/role_home_screen.dart';
 import '../../presentation/nutricionista/nutricionista_panel_screen.dart';
 import '../../presentation/nutricionista/patient_detail_screen.dart';
+import '../../presentation/paciente/paciente_panel_screen.dart';
 import '../../presentation/splash/splash_screen.dart';
 import '../providers/app_providers.dart';
 
@@ -72,9 +72,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/paciente',
-        builder: (context, state) => const RoleHomeScreen(
-          role: UserRole.paciente,
-        ),
+        builder: (context, state) => const PacientePanelScreen(),
       ),
     ],
   );

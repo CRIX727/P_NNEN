@@ -1,0 +1,32 @@
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Configuracion local
+local.properties
+
+# Archivos temporales
+*.log
+.DS_Store
+
+# Credenciales y llaves
+*.jks
+*.keystore
+*.p12
+.env
+.env.*
+
+# Google Services local, si contiene configuracion privada
+google-services.json
+
+# Claves generadas
+captures/
+.externalNativeBuild/
+.cxx/

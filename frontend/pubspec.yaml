@@ -17,10 +17,10 @@ dependencies:
   drift: ^2.25.0
   drift_flutter: ^0.2.4
   sqlite3_flutter_libs: ^0.5.35
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^11.2.0
   intl: ^0.20.2
   fl_chart: ^0.70.2
-  file_picker: ^9.2.3
+  file_picker: ^13.1.0
   image_picker: ^1.1.2
   url_launcher: ^6.3.1
   socket_io_client: ^3.1.2

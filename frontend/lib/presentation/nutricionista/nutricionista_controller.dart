@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
+import '../../core/services/session_manager.dart';
+import '../../data/remote/chat_socket_service.dart';
 import '../../data/repositories/nutritionist_repository.dart';
 import '../../domain/entities/cita_paciente.dart';
 import '../../domain/entities/documento_paciente.dart';
@@ -12,9 +16,12 @@ import '../../domain/entities/plantilla_plan.dart';
 import 'nutricionista_state.dart';
 
 class NutricionistaController extends ChangeNotifier {
-  NutricionistaController(this._repository);
+  NutricionistaController(this._repository, this._chat, this._sessionManager);
 
   final NutritionistRepository _repository;
+  final ChatSocketService _chat;
+  final SessionManager _sessionManager;
+  StreamSubscription? _messageSubscription;
 
   NutricionistaState _state = const NutricionistaState.initial();
   NutricionistaState get state => _state;
@@ -69,6 +76,11 @@ class NutricionistaController extends ChangeNotifier {
           documents: documents,
         ),
       );
+      final token = await _sessionManager.getAccessToken();
+      if (token != null && token.isNotEmpty) {
+        await _chat.connect(token: token, patientId: id);
+        _messageSubscription ??= _chat.messages.listen(_onRealtimeMessage);
+      }
     } catch (error) {
       _emit(_state.copyWith(message: _message(error)));
     }
@@ -143,12 +155,32 @@ class NutricionistaController extends ChangeNotifier {
   Future<void> addMessage(int patientId, MensajePaciente message) async {
     _setBusy(true);
     try {
-      await _repository.createMessage(patientId, message);
-      await selectPatient(patientId);
-      _emit(_state.copyWith(message: 'Mensaje enviado'));
+      if (_chat.isConnected) {
+        _chat.sendMessage(message.contenido);
+        _emit(_state.copyWith(loading: false, message: 'Mensaje enviado'));
+      } else {
+        await _repository.createMessage(patientId, message);
+        await selectPatient(patientId);
+        _emit(_state.copyWith(message: 'Mensaje enviado'));
+      }
     } catch (error) {
       _emit(_state.copyWith(loading: false, message: _message(error)));
     }
+  }
+
+  void _onRealtimeMessage(MensajePaciente message) {
+    if (_state.selectedPatient?.id != message.pacienteId ||
+        _state.messages.any((item) => item.id == message.id)) {
+      return;
+    }
+    _emit(_state.copyWith(messages: [..._state.messages, message]));
+  }
+
+  @override
+  void dispose() {
+    _messageSubscription?.cancel();
+    _chat.disconnect();
+    super.dispose();
   }
 
   Future<void> addPayment(int patientId, PagoPaciente payment) async {
