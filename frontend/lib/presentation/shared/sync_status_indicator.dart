@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,6 +22,7 @@ class _SyncStatusIndicatorState extends ConsumerState<SyncStatusIndicator> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb) return;
     _refresh();
     _timer = Timer.periodic(const Duration(seconds: 5), (_) => _refresh());
   }
@@ -38,6 +40,18 @@ class _SyncStatusIndicatorState extends ConsumerState<SyncStatusIndicator> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Center(
+          child: Text(
+            'Conectado',
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
+        ),
+      );
+    }
+
     return StreamBuilder<bool>(
       stream: ref.read(networkMonitorProvider).status,
       initialData: ref.read(networkMonitorProvider).isOnline,
