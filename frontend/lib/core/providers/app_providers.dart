@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -126,6 +127,11 @@ final remoteNutritionistRepositoryProvider =
 
 final nutritionistRepositoryProvider = Provider<NutritionistRepository>((ref) {
   final session = ref.watch(authControllerProvider).state.session;
+  // Flutter Web uses the API directly. Drift/SQLite remains enabled for
+  // Android and Windows, where the offline database is supported.
+  if (kIsWeb) {
+    return ref.watch(remoteNutritionistRepositoryProvider);
+  }
   return OfflineNutritionistRepository(
     remote: ref.watch(remoteNutritionistRepositoryProvider),
     database: ref.watch(localDatabaseProvider),
@@ -160,6 +166,9 @@ final remotePatientRepositoryProvider = Provider<PatientRepository>((ref) {
 
 final patientRepositoryProvider = Provider<PatientRepository>((ref) {
   final session = ref.watch(authControllerProvider).state.session;
+  if (kIsWeb) {
+    return ref.watch(remotePatientRepositoryProvider);
+  }
   return OfflinePatientRepository(
     remote: ref.watch(remotePatientRepositoryProvider),
     database: ref.watch(localDatabaseProvider),
