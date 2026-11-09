@@ -13,6 +13,8 @@ class CitaPaciente {
     required this.motivo,
     required this.estado,
     required this.canalRecordatorio,
+    this.asistencia = 'PENDIENTE',
+    this.notas = '',
   });
 
   final int id;
@@ -21,5 +23,6 @@ class CitaPaciente {
   final String motivo;
   final CitaEstado estado;
   final String canalRecordatorio;
+  final String asistencia;
+  final String notas;
 }
-

@@ -6,12 +6,15 @@ import '../../core/services/session_manager.dart';
 import '../../data/remote/chat_socket_service.dart';
 import '../../data/repositories/nutritionist_repository.dart';
 import '../../domain/entities/cita_paciente.dart';
+import '../../domain/entities/consulta.dart';
 import '../../domain/entities/documento_paciente.dart';
+import '../../domain/entities/evaluacion.dart';
 import '../../domain/entities/mensaje_paciente.dart';
 import '../../domain/entities/nutricionista_settings.dart';
 import '../../domain/entities/paciente.dart';
 import '../../domain/entities/pago_paciente.dart';
 import '../../domain/entities/plan_alimenticio.dart';
+import '../../domain/entities/tarea_nutricionista.dart';
 import '../../domain/entities/plantilla_plan.dart';
 import 'nutricionista_state.dart';
 
@@ -31,15 +34,21 @@ class NutricionistaController extends ChangeNotifier {
     try {
       final summary = await _repository.getDashboard();
       final pacientes = await _repository.getPatients();
+      final invitations = await _repository.getInvitations();
       final templates = await _repository.getTemplates();
       final settings = await _repository.getSettings();
+      final foods = await _repository.getFoods();
+      final tasks = await _repository.getTasks();
       _emit(
         _state.copyWith(
           loading: false,
           summary: summary,
           pacientes: pacientes,
+          invitations: invitations,
           templates: templates,
           settings: settings,
+          foods: foods,
+          tasks: tasks,
           selectedPatient: pacientes.isNotEmpty ? pacientes.first : null,
         ),
       );
@@ -64,6 +73,7 @@ class NutricionistaController extends ChangeNotifier {
       final messages = await _repository.getMessages(id);
       final payments = await _repository.getPayments(id);
       final documents = await _repository.getDocuments(id);
+      final consultations = await _repository.getConsultations(id);
 
       _emit(
         _state.copyWith(
@@ -74,6 +84,7 @@ class NutricionistaController extends ChangeNotifier {
           messages: messages,
           payments: payments,
           documents: documents,
+          consultations: consultations,
         ),
       );
       final token = await _sessionManager.getAccessToken();
@@ -98,6 +109,20 @@ class NutricionistaController extends ChangeNotifier {
     }
   }
 
+  Future<void> createInvitation(String correo) async {
+    _setBusy(true);
+    try {
+      await _repository.createInvitation(correo.trim());
+      final invitations = await _repository.getInvitations();
+      _emit(_state.copyWith(
+          loading: false,
+          invitations: invitations,
+          message: 'Invitación enviada'));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
   Future<void> updatePatient(Paciente patient) async {
     _setBusy(true);
     try {
@@ -117,14 +142,35 @@ class NutricionistaController extends ChangeNotifier {
     double peso,
     double altura,
     double grasa,
-    String fecha,
-  ) async {
+    String fecha, {
+    double cintura = 0,
+    double cadera = 0,
+    double brazo = 0,
+    String plieguesCutaneos = '',
+    double porcentajeMusculo = 0,
+  }) async {
     _setBusy(true);
     try {
-      await _repository.createEvaluation(patientId, peso, altura, grasa, fecha);
+      await _repository.createEvaluation(patientId, peso, altura, grasa, fecha,
+          cintura: cintura,
+          cadera: cadera,
+          brazo: brazo,
+          plieguesCutaneos: plieguesCutaneos,
+          porcentajeMusculo: porcentajeMusculo);
       await selectPatient(patientId);
       await loadAll();
       _emit(_state.copyWith(message: 'Evaluación registrada'));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
+  Future<void> updateEvaluation(int patientId, Evaluacion evaluation) async {
+    _setBusy(true);
+    try {
+      await _repository.updateEvaluation(patientId, evaluation);
+      await selectPatient(patientId);
+      _emit(_state.copyWith(message: 'Evaluación actualizada'));
     } catch (error) {
       _emit(_state.copyWith(loading: false, message: _message(error)));
     }
@@ -141,12 +187,35 @@ class NutricionistaController extends ChangeNotifier {
     }
   }
 
+  Future<void> updatePlan(int patientId, PlanAlimenticio plan) async {
+    _setBusy(true);
+    try {
+      await _repository.updatePlan(patientId, plan);
+      await selectPatient(patientId);
+      _emit(_state.copyWith(message: 'Plan alimenticio actualizado'));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
   Future<void> addAppointment(int patientId, CitaPaciente appointment) async {
     _setBusy(true);
     try {
       await _repository.createAppointment(patientId, appointment);
       await selectPatient(patientId);
       _emit(_state.copyWith(message: 'Cita guardada'));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
+  Future<void> updateAppointment(
+      int patientId, CitaPaciente appointment) async {
+    _setBusy(true);
+    try {
+      await _repository.updateAppointment(patientId, appointment);
+      await selectPatient(patientId);
+      _emit(_state.copyWith(message: 'Cita actualizada'));
     } catch (error) {
       _emit(_state.copyWith(loading: false, message: _message(error)));
     }
@@ -174,6 +243,7 @@ class NutricionistaController extends ChangeNotifier {
       return;
     }
     _emit(_state.copyWith(messages: [..._state.messages, message]));
+    if (message.remitente == 'paciente') _chat.markRead(message.id);
   }
 
   @override
@@ -194,6 +264,17 @@ class NutricionistaController extends ChangeNotifier {
     }
   }
 
+  Future<void> updatePayment(int patientId, PagoPaciente payment) async {
+    _setBusy(true);
+    try {
+      await _repository.updatePayment(patientId, payment);
+      await selectPatient(patientId);
+      _emit(_state.copyWith(message: 'Pago actualizado'));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
   Future<void> addDocument(int patientId, DocumentoPaciente document) async {
     _setBusy(true);
     try {
@@ -202,6 +283,58 @@ class NutricionistaController extends ChangeNotifier {
       _emit(_state.copyWith(message: 'Documento adjuntado'));
     } catch (error) {
       _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
+  Future<void> uploadDocument(int patientId, String filePath,
+      {String? nombre}) async {
+    _setBusy(true);
+    try {
+      await _repository.uploadDocument(patientId, filePath, nombre: nombre);
+      await selectPatient(patientId);
+      _emit(_state.copyWith(message: 'Archivo subido correctamente'));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
+  Future<void> addConsultation(int patientId, Consulta consultation) async {
+    _setBusy(true);
+    try {
+      await _repository.createConsultation(patientId, consultation);
+      await selectPatient(patientId);
+      _emit(_state.copyWith(message: 'Consulta registrada'));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
+  Future<void> createTask(TareaNutricionista task) async {
+    _setBusy(true);
+    try {
+      final created = await _repository.createTask(task);
+      _emit(_state.copyWith(
+        loading: false,
+        tasks: [..._state.tasks, created],
+        message: 'Tarea guardada',
+      ));
+    } catch (error) {
+      _emit(_state.copyWith(loading: false, message: _message(error)));
+    }
+  }
+
+  Future<void> updateTask(TareaNutricionista task) async {
+    try {
+      final updated = await _repository.updateTask(task);
+      _emit(_state.copyWith(
+        tasks: [
+          for (final item in _state.tasks)
+            if (item.id == updated.id) updated else item,
+        ],
+        message: 'Tarea actualizada',
+      ));
+    } catch (error) {
+      _emit(_state.copyWith(message: _message(error)));
     }
   }
 

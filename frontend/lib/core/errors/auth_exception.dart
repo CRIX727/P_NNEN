@@ -10,4 +10,3 @@ class AuthRepositoryException implements Exception {
   @override
   String toString() => message;
 }
-

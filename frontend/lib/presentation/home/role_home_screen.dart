@@ -57,4 +57,3 @@ class RoleHomeScreen extends ConsumerWidget {
     );
   }
 }
-

@@ -10,4 +10,3 @@ class RefreshSessionUseCase {
     return _repository.refreshSession();
   }
 }
-

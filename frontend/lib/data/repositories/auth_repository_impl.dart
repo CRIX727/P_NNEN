@@ -17,6 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   final AuthApi _authApi;
   final SessionManager _sessionManager;
+  Future<AuthSession>? _refreshInFlight;
 
   @override
   Future<AuthSession?> getSavedSession() async {
@@ -62,6 +63,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthSession> refreshSession() async {
+    _refreshInFlight ??= _refreshSessionOnce();
+    try {
+      return await _refreshInFlight!;
+    } finally {
+      _refreshInFlight = null;
+    }
+  }
+
+  Future<AuthSession> _refreshSessionOnce() async {
     final refreshToken = await _sessionManager.getRefreshToken();
     if (refreshToken == null || refreshToken.isEmpty) {
       throw const AuthRepositoryException('No existe sesión activa');
@@ -81,7 +91,8 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     final refreshToken = await _sessionManager.getRefreshToken();
     if (refreshToken != null && refreshToken.isNotEmpty) {
-      await runCatching(() => _authApi.logout(LogoutRequestDto(refreshToken: refreshToken)));
+      await runCatching(
+          () => _authApi.logout(LogoutRequestDto(refreshToken: refreshToken)));
     }
     await _sessionManager.clear();
   }

@@ -9,6 +9,11 @@ class Evaluacion {
     required this.get,
     required this.grasa,
     required this.fecha,
+    this.cintura = 0,
+    this.cadera = 0,
+    this.brazo = 0,
+    this.plieguesCutaneos = '',
+    this.porcentajeMusculo = 0,
   });
 
   final int id;
@@ -20,4 +25,9 @@ class Evaluacion {
   final double get;
   final double grasa;
   final String fecha;
+  final double cintura;
+  final double cadera;
+  final double brazo;
+  final String plieguesCutaneos;
+  final double porcentajeMusculo;
 }

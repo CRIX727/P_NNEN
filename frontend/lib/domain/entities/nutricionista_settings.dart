@@ -7,4 +7,3 @@ class NutricionistaSettings {
   final double precioConsulta;
   final String whatsapp;
 }
-

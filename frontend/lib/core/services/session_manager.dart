@@ -18,9 +18,12 @@ class SessionManager {
   static const _userRoleKey = 'nnen_user_role';
 
   Future<void> saveSession(AuthSession session) async {
-    await _secureStorage.write(key: _accessTokenKey, value: session.accessToken);
-    await _secureStorage.write(key: _refreshTokenKey, value: session.refreshToken);
-    await _secureStorage.write(key: _userIdKey, value: session.userId.toString());
+    await _secureStorage.write(
+        key: _accessTokenKey, value: session.accessToken);
+    await _secureStorage.write(
+        key: _refreshTokenKey, value: session.refreshToken);
+    await _secureStorage.write(
+        key: _userIdKey, value: session.userId.toString());
     await _secureStorage.write(key: _userNameKey, value: session.name);
     await _secureStorage.write(key: _userEmailKey, value: session.email);
     await _secureStorage.write(key: _userRoleKey, value: session.role.name);

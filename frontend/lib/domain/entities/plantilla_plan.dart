@@ -13,4 +13,3 @@ class PlantillaPlan {
   final String condicion;
   final String descripcion;
 }
-

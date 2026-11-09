@@ -5,6 +5,7 @@ class MensajePaciente {
     required this.remitente,
     required this.contenido,
     required this.fecha,
+    this.leido = false,
   });
 
   final int id;
@@ -12,5 +13,5 @@ class MensajePaciente {
   final String remitente;
   final String contenido;
   final String fecha;
+  final bool leido;
 }
-

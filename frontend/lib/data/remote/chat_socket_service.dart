@@ -10,9 +10,13 @@ class ChatSocketService {
   io.Socket? _socket;
   final _messages = StreamController<MensajePaciente>.broadcast();
   final _errors = StreamController<String>.broadcast();
+  final _presence = StreamController<bool>.broadcast();
+  final _statuses = StreamController<MessageStatus>.broadcast();
 
   Stream<MensajePaciente> get messages => _messages.stream;
   Stream<String> get errors => _errors.stream;
+  Stream<bool> get presence => _presence.stream;
+  Stream<MessageStatus> get statuses => _statuses.stream;
   bool get isConnected => _socket?.connected ?? false;
 
   Future<void> connect({required String token, required int patientId}) async {
@@ -36,11 +40,26 @@ class ChatSocketService {
     });
     socket.on('message_received', (data) {
       if (data is Map) {
-        _messages.add(MessageDto.fromJson(Map<String, dynamic>.from(data)).toEntity());
+        _messages.add(
+            MessageDto.fromJson(Map<String, dynamic>.from(data)).toEntity());
       }
     });
     socket.on('chat_error', (data) {
       _errors.add(data?.toString() ?? 'No se pudo conectar al chat');
+    });
+    socket.on('presence_status', (data) {
+      if (data is Map) {
+        _presence.add(data['online'] == true);
+      }
+    });
+    socket.on('message_status', (data) {
+      if (data is Map) {
+        final id = int.tryParse('${data['messageId']}');
+        final status = data['status']?.toString();
+        if (id != null && status != null) {
+          _statuses.add(MessageStatus(id, status));
+        }
+      }
     });
     socket.onConnectError((_) {
       _errors.add('El chat en tiempo real no está disponible');
@@ -50,6 +69,10 @@ class ChatSocketService {
 
   void sendMessage(String content) {
     if (isConnected) _socket!.emit('send_message', {'contenido': content});
+  }
+
+  void markRead(int messageId) {
+    if (isConnected) _socket!.emit('mark_read', {'messageId': messageId});
   }
 
   void disconnect() {
@@ -62,5 +85,14 @@ class ChatSocketService {
     disconnect();
     _messages.close();
     _errors.close();
+    _presence.close();
+    _statuses.close();
   }
+}
+
+class MessageStatus {
+  const MessageStatus(this.messageId, this.status);
+
+  final int messageId;
+  final String status;
 }

@@ -15,4 +15,3 @@ class DocumentoPaciente {
   final String uri;
   final String fecha;
 }
-

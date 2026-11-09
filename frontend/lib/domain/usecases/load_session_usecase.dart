@@ -10,4 +10,3 @@ class LoadSessionUseCase {
     return _repository.getSavedSession();
   }
 }
-

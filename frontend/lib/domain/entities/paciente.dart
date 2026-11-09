@@ -14,6 +14,23 @@ class Paciente {
     required this.factorActividad,
     required this.telefono,
     required this.notas,
+    this.motivoConsulta = '',
+    this.antecedentesFamiliares = '',
+    this.historialMedico = '',
+    this.medicamentos = '',
+    this.habitosAlimenticios = '',
+    this.consumoAgua = '',
+    this.actividadFisica = '',
+    this.objetivos = '',
+    this.notasPrivadas = '',
+    this.cintura = 0,
+    this.cadera = 0,
+    this.brazo = 0,
+    this.plieguesCutaneos = '',
+    this.porcentajeMusculo = 0,
+    this.autorizacionEstado = 'PENDIENTE',
+    this.autorizacionFecha = '',
+    this.autorizacionFirma = '',
   });
 
   final int id;
@@ -30,6 +47,23 @@ class Paciente {
   final double factorActividad;
   final String telefono;
   final String notas;
+  final String motivoConsulta;
+  final String antecedentesFamiliares;
+  final String historialMedico;
+  final String medicamentos;
+  final String habitosAlimenticios;
+  final String consumoAgua;
+  final String actividadFisica;
+  final String objetivos;
+  final String notasPrivadas;
+  final double cintura;
+  final double cadera;
+  final double brazo;
+  final String plieguesCutaneos;
+  final double porcentajeMusculo;
+  final String autorizacionEstado;
+  final String autorizacionFecha;
+  final String autorizacionFirma;
 
   Paciente copyWith({
     int? id,
@@ -46,6 +80,23 @@ class Paciente {
     double? factorActividad,
     String? telefono,
     String? notas,
+    String? motivoConsulta,
+    String? antecedentesFamiliares,
+    String? historialMedico,
+    String? medicamentos,
+    String? habitosAlimenticios,
+    String? consumoAgua,
+    String? actividadFisica,
+    String? objetivos,
+    String? notasPrivadas,
+    double? cintura,
+    double? cadera,
+    double? brazo,
+    String? plieguesCutaneos,
+    double? porcentajeMusculo,
+    String? autorizacionEstado,
+    String? autorizacionFecha,
+    String? autorizacionFirma,
   }) {
     return Paciente(
       id: id ?? this.id,
@@ -62,6 +113,24 @@ class Paciente {
       factorActividad: factorActividad ?? this.factorActividad,
       telefono: telefono ?? this.telefono,
       notas: notas ?? this.notas,
+      motivoConsulta: motivoConsulta ?? this.motivoConsulta,
+      antecedentesFamiliares:
+          antecedentesFamiliares ?? this.antecedentesFamiliares,
+      historialMedico: historialMedico ?? this.historialMedico,
+      medicamentos: medicamentos ?? this.medicamentos,
+      habitosAlimenticios: habitosAlimenticios ?? this.habitosAlimenticios,
+      consumoAgua: consumoAgua ?? this.consumoAgua,
+      actividadFisica: actividadFisica ?? this.actividadFisica,
+      objetivos: objetivos ?? this.objetivos,
+      notasPrivadas: notasPrivadas ?? this.notasPrivadas,
+      cintura: cintura ?? this.cintura,
+      cadera: cadera ?? this.cadera,
+      brazo: brazo ?? this.brazo,
+      plieguesCutaneos: plieguesCutaneos ?? this.plieguesCutaneos,
+      porcentajeMusculo: porcentajeMusculo ?? this.porcentajeMusculo,
+      autorizacionEstado: autorizacionEstado ?? this.autorizacionEstado,
+      autorizacionFecha: autorizacionFecha ?? this.autorizacionFecha,
+      autorizacionFirma: autorizacionFirma ?? this.autorizacionFirma,
     );
   }
 }

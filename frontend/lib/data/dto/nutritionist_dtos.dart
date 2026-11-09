@@ -25,6 +25,23 @@ class PatientDto {
     required this.factorActividad,
     required this.telefono,
     required this.notas,
+    this.motivoConsulta = '',
+    this.antecedentesFamiliares = '',
+    this.historialMedico = '',
+    this.medicamentos = '',
+    this.habitosAlimenticios = '',
+    this.consumoAgua = '',
+    this.actividadFisica = '',
+    this.objetivos = '',
+    this.notasPrivadas = '',
+    this.cintura = 0,
+    this.cadera = 0,
+    this.brazo = 0,
+    this.plieguesCutaneos = '',
+    this.porcentajeMusculo = 0,
+    this.autorizacionEstado = 'PENDIENTE',
+    this.autorizacionFecha = '',
+    this.autorizacionFirma = '',
   });
 
   factory PatientDto.fromJson(Map<String, dynamic> json) {
@@ -43,6 +60,23 @@ class PatientDto {
       factorActividad: (json['factorActividad'] as num?)?.toDouble() ?? 1.2,
       telefono: json['telefono'] as String? ?? '',
       notas: json['notas'] as String? ?? '',
+      motivoConsulta: json['motivoConsulta'] as String? ?? '',
+      antecedentesFamiliares: json['antecedentesFamiliares'] as String? ?? '',
+      historialMedico: json['historialMedico'] as String? ?? '',
+      medicamentos: json['medicamentos'] as String? ?? '',
+      habitosAlimenticios: json['habitosAlimenticios'] as String? ?? '',
+      consumoAgua: json['consumoAgua'] as String? ?? '',
+      actividadFisica: json['actividadFisica'] as String? ?? '',
+      objetivos: json['objetivos'] as String? ?? '',
+      notasPrivadas: json['notasPrivadas'] as String? ?? '',
+      cintura: (json['cintura'] as num?)?.toDouble() ?? 0,
+      cadera: (json['cadera'] as num?)?.toDouble() ?? 0,
+      brazo: (json['brazo'] as num?)?.toDouble() ?? 0,
+      plieguesCutaneos: json['plieguesCutaneos'] as String? ?? '',
+      porcentajeMusculo: (json['porcentajeMusculo'] as num?)?.toDouble() ?? 0,
+      autorizacionEstado: json['autorizacionEstado'] as String? ?? 'PENDIENTE',
+      autorizacionFecha: json['autorizacionFecha'] as String? ?? '',
+      autorizacionFirma: json['autorizacionFirma'] as String? ?? '',
     );
   }
 
@@ -60,6 +94,23 @@ class PatientDto {
   final double factorActividad;
   final String telefono;
   final String notas;
+  final String motivoConsulta;
+  final String antecedentesFamiliares;
+  final String historialMedico;
+  final String medicamentos;
+  final String habitosAlimenticios;
+  final String consumoAgua;
+  final String actividadFisica;
+  final String objetivos;
+  final String notasPrivadas;
+  final double cintura;
+  final double cadera;
+  final double brazo;
+  final String plieguesCutaneos;
+  final double porcentajeMusculo;
+  final String autorizacionEstado;
+  final String autorizacionFecha;
+  final String autorizacionFirma;
 
   Map<String, dynamic> toJson() => {
         'nombre': nombre,
@@ -74,6 +125,23 @@ class PatientDto {
         'factorActividad': factorActividad,
         'telefono': telefono,
         'notas': notas,
+        'motivoConsulta': motivoConsulta,
+        'antecedentesFamiliares': antecedentesFamiliares,
+        'historialMedico': historialMedico,
+        'medicamentos': medicamentos,
+        'habitosAlimenticios': habitosAlimenticios,
+        'consumoAgua': consumoAgua,
+        'actividadFisica': actividadFisica,
+        'objetivos': objetivos,
+        'notasPrivadas': notasPrivadas,
+        'cintura': cintura,
+        'cadera': cadera,
+        'brazo': brazo,
+        'plieguesCutaneos': plieguesCutaneos,
+        'porcentajeMusculo': porcentajeMusculo,
+        'autorizacionEstado': autorizacionEstado,
+        'autorizacionFecha': autorizacionFecha,
+        'autorizacionFirma': autorizacionFirma,
       };
 
   Paciente toEntity() {
@@ -92,6 +160,23 @@ class PatientDto {
       factorActividad: factorActividad,
       telefono: telefono,
       notas: notas,
+      motivoConsulta: motivoConsulta,
+      antecedentesFamiliares: antecedentesFamiliares,
+      historialMedico: historialMedico,
+      medicamentos: medicamentos,
+      habitosAlimenticios: habitosAlimenticios,
+      consumoAgua: consumoAgua,
+      actividadFisica: actividadFisica,
+      objetivos: objetivos,
+      notasPrivadas: notasPrivadas,
+      cintura: cintura,
+      cadera: cadera,
+      brazo: brazo,
+      plieguesCutaneos: plieguesCutaneos,
+      porcentajeMusculo: porcentajeMusculo,
+      autorizacionEstado: autorizacionEstado,
+      autorizacionFecha: autorizacionFecha,
+      autorizacionFirma: autorizacionFirma,
     );
   }
 }
@@ -107,6 +192,11 @@ class EvaluationDto {
     required this.get,
     required this.grasa,
     required this.fecha,
+    this.cintura = 0,
+    this.cadera = 0,
+    this.brazo = 0,
+    this.plieguesCutaneos = '',
+    this.porcentajeMusculo = 0,
   });
 
   factory EvaluationDto.fromJson(Map<String, dynamic> json) {
@@ -119,6 +209,11 @@ class EvaluationDto {
       tmb: (json['tmb'] as num?)?.toDouble() ?? 0,
       get: (json['get'] as num?)?.toDouble() ?? 0,
       grasa: (json['grasa'] as num).toDouble(),
+      cintura: (json['cintura'] as num?)?.toDouble() ?? 0,
+      cadera: (json['cadera'] as num?)?.toDouble() ?? 0,
+      brazo: (json['brazo'] as num?)?.toDouble() ?? 0,
+      plieguesCutaneos: json['plieguesCutaneos'] as String? ?? '',
+      porcentajeMusculo: (json['porcentajeMusculo'] as num?)?.toDouble() ?? 0,
       fecha: json['fecha'] as String? ?? '',
     );
   }
@@ -131,6 +226,11 @@ class EvaluationDto {
   final double tmb;
   final double get;
   final double grasa;
+  final double cintura;
+  final double cadera;
+  final double brazo;
+  final String plieguesCutaneos;
+  final double porcentajeMusculo;
   final String fecha;
 
   Map<String, dynamic> toJson() => {
@@ -150,6 +250,11 @@ class EvaluationDto {
       tmb: tmb,
       get: get,
       grasa: grasa,
+      cintura: cintura,
+      cadera: cadera,
+      brazo: brazo,
+      plieguesCutaneos: plieguesCutaneos,
+      porcentajeMusculo: porcentajeMusculo,
       fecha: fecha,
     );
   }
@@ -166,6 +271,18 @@ class PlanDto {
     required this.plantillaNombre,
     required this.fechaInicio,
     required this.fechaFin,
+    this.comidas = '',
+    this.sustituciones = '',
+    this.calorias = 0,
+    this.proteinas = 0,
+    this.carbohidratos = 0,
+    this.grasasMacros = 0,
+    this.periodo = 'Diario',
+    this.recordatorio24h = '',
+    this.listaCompras = '',
+    this.recetas = '',
+    this.distribucionCalorias = '',
+    this.aguaRecomendada = 0,
   });
 
   factory PlanDto.fromJson(Map<String, dynamic> json) {
@@ -179,6 +296,18 @@ class PlanDto {
       plantillaNombre: json['plantillaNombre'] as String? ?? '',
       fechaInicio: json['fechaInicio'] as String? ?? '',
       fechaFin: json['fechaFin'] as String? ?? '',
+      comidas: json['comidas'] as String? ?? '',
+      sustituciones: json['sustituciones'] as String? ?? '',
+      calorias: (json['calorias'] as num?)?.toDouble() ?? 0,
+      proteinas: (json['proteinas'] as num?)?.toDouble() ?? 0,
+      carbohidratos: (json['carbohidratos'] as num?)?.toDouble() ?? 0,
+      grasasMacros: (json['grasasMacros'] as num?)?.toDouble() ?? 0,
+      periodo: json['periodo'] as String? ?? 'Diario',
+      recordatorio24h: json['recordatorio24h'] as String? ?? '',
+      listaCompras: json['listaCompras'] as String? ?? '',
+      recetas: json['recetas'] as String? ?? '',
+      distribucionCalorias: json['distribucionCalorias'] as String? ?? '',
+      aguaRecomendada: (json['aguaRecomendada'] as num?)?.toDouble() ?? 0,
     );
   }
 
@@ -191,6 +320,18 @@ class PlanDto {
   final String plantillaNombre;
   final String fechaInicio;
   final String fechaFin;
+  final String comidas;
+  final String sustituciones;
+  final double calorias;
+  final double proteinas;
+  final double carbohidratos;
+  final double grasasMacros;
+  final String periodo;
+  final String recordatorio24h;
+  final String listaCompras;
+  final String recetas;
+  final String distribucionCalorias;
+  final double aguaRecomendada;
 
   Map<String, dynamic> toJson() => {
         'titulo': titulo,
@@ -200,6 +341,18 @@ class PlanDto {
         'plantillaNombre': plantillaNombre,
         'fechaInicio': fechaInicio,
         'fechaFin': fechaFin,
+        'comidas': comidas,
+        'sustituciones': sustituciones,
+        'calorias': calorias,
+        'proteinas': proteinas,
+        'carbohidratos': carbohidratos,
+        'grasasMacros': grasasMacros,
+        'periodo': periodo,
+        'recordatorio24h': recordatorio24h,
+        'listaCompras': listaCompras,
+        'recetas': recetas,
+        'distribucionCalorias': distribucionCalorias,
+        'aguaRecomendada': aguaRecomendada,
       };
 
   PlanAlimenticio toEntity() {
@@ -213,6 +366,18 @@ class PlanDto {
       plantillaNombre: plantillaNombre,
       fechaInicio: fechaInicio,
       fechaFin: fechaFin,
+      comidas: comidas,
+      sustituciones: sustituciones,
+      calorias: calorias,
+      proteinas: proteinas,
+      carbohidratos: carbohidratos,
+      grasasMacros: grasasMacros,
+      periodo: periodo,
+      recordatorio24h: recordatorio24h,
+      listaCompras: listaCompras,
+      recetas: recetas,
+      distribucionCalorias: distribucionCalorias,
+      aguaRecomendada: aguaRecomendada,
     );
   }
 }
@@ -225,6 +390,8 @@ class AppointmentDto {
     required this.motivo,
     required this.estado,
     required this.canalRecordatorio,
+    this.asistencia = 'PENDIENTE',
+    this.notas = '',
   });
 
   factory AppointmentDto.fromJson(Map<String, dynamic> json) {
@@ -233,8 +400,11 @@ class AppointmentDto {
       pacienteId: (json['pacienteId'] as num).toInt(),
       fecha: json['fecha'] as String? ?? '',
       motivo: json['motivo'] as String? ?? '',
-      estado: _appointmentStateFromString(json['estado'] as String? ?? 'AGENDADA'),
+      estado:
+          _appointmentStateFromString(json['estado'] as String? ?? 'AGENDADA'),
       canalRecordatorio: json['canalRecordatorio'] as String? ?? '',
+      asistencia: json['asistencia'] as String? ?? 'PENDIENTE',
+      notas: json['notas'] as String? ?? '',
     );
   }
 
@@ -244,12 +414,16 @@ class AppointmentDto {
   final String motivo;
   final CitaEstado estado;
   final String canalRecordatorio;
+  final String asistencia;
+  final String notas;
 
   Map<String, dynamic> toJson() => {
         'fecha': fecha,
         'motivo': motivo,
         'estado': _appointmentStateToApi(estado),
         'canalRecordatorio': canalRecordatorio,
+        'asistencia': asistencia,
+        'notas': notas,
       };
 
   CitaPaciente toEntity() {
@@ -260,6 +434,8 @@ class AppointmentDto {
       motivo: motivo,
       estado: estado,
       canalRecordatorio: canalRecordatorio,
+      asistencia: asistencia,
+      notas: notas,
     );
   }
 }
@@ -271,6 +447,7 @@ class MessageDto {
     required this.remitente,
     required this.contenido,
     required this.fecha,
+    this.leido = false,
   });
 
   factory MessageDto.fromJson(Map<String, dynamic> json) {
@@ -280,6 +457,7 @@ class MessageDto {
       remitente: json['remitente'] as String? ?? '',
       contenido: json['contenido'] as String? ?? '',
       fecha: json['fecha'] as String? ?? '',
+      leido: json['leido'] as bool? ?? false,
     );
   }
 
@@ -288,6 +466,7 @@ class MessageDto {
   final String remitente;
   final String contenido;
   final String fecha;
+  final bool leido;
 
   Map<String, dynamic> toJson() => {
         'remitente': remitente,
@@ -302,6 +481,7 @@ class MessageDto {
       remitente: remitente,
       contenido: contenido,
       fecha: fecha,
+      leido: leido,
     );
   }
 }
@@ -452,6 +632,9 @@ class DashboardDto {
     required this.totalMensajes,
     required this.pagosPendientes,
     required this.imcPromedio,
+    this.pacientesNuevos = 0,
+    this.pacientesEnRiesgo = 0,
+    this.citasProximas = 0,
   });
 
   factory DashboardDto.fromJson(Map<String, dynamic> json) {
@@ -463,6 +646,9 @@ class DashboardDto {
       totalMensajes: (json['totalMensajes'] as num?)?.toInt() ?? 0,
       pagosPendientes: (json['pagosPendientes'] as num?)?.toInt() ?? 0,
       imcPromedio: (json['imcPromedio'] as num?)?.toDouble() ?? 0,
+      pacientesNuevos: (json['pacientesNuevos'] as num?)?.toInt() ?? 0,
+      pacientesEnRiesgo: (json['pacientesEnRiesgo'] as num?)?.toInt() ?? 0,
+      citasProximas: (json['citasProximas'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -473,6 +659,9 @@ class DashboardDto {
   final int totalMensajes;
   final int pagosPendientes;
   final double imcPromedio;
+  final int pacientesNuevos;
+  final int pacientesEnRiesgo;
+  final int citasProximas;
 
   NutricionistaSummary toEntity() {
     return NutricionistaSummary(
@@ -483,6 +672,9 @@ class DashboardDto {
       totalMensajes: totalMensajes,
       pagosPendientes: pagosPendientes,
       imcPromedio: imcPromedio,
+      pacientesNuevos: pacientesNuevos,
+      pacientesEnRiesgo: pacientesEnRiesgo,
+      citasProximas: citasProximas,
     );
   }
 }
@@ -546,4 +738,3 @@ PagoEstado _paymentStateFromString(String value) {
       ? PagoEstado.pagado
       : PagoEstado.pendiente;
 }
-

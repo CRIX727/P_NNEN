@@ -37,7 +37,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         final roleRoute = authState.session?.role == UserRole.nutricionista
             ? '/nutricionista'
             : '/paciente';
-        if (location == '/splash' || location == '/login' || location == '/register') {
+        if (location == '/splash' ||
+            location == '/login' ||
+            location == '/register') {
           return roleRoute;
         }
       }

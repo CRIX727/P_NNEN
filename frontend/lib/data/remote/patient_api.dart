@@ -12,6 +12,19 @@ class PatientApi {
     return PatientProfileDto.fromJson(response.data ?? {});
   }
 
+  Future<List<Map<String, dynamic>>> getInvitations() async {
+    final response = await _dio.get<List<dynamic>>('/paciente/invitaciones');
+    return (response.data ?? []).whereType<Map<String, dynamic>>().toList();
+  }
+
+  Future<void> acceptInvitation(int id) async {
+    await _dio.post<void>('/paciente/invitaciones/$id/aceptar');
+  }
+
+  Future<void> rejectInvitation(int id) async {
+    await _dio.post<void>('/paciente/invitaciones/$id/rechazar');
+  }
+
   Future<List<EvaluationDto>> getEvaluations() async {
     final response = await _dio.get<List<dynamic>>('/paciente/evaluaciones');
     return (response.data ?? [])
@@ -66,6 +79,42 @@ class PatientApi {
         .whereType<Map<String, dynamic>>()
         .map(DocumentDto.fromJson)
         .toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getNotifications() async {
+    final response = await _dio.get<List<dynamic>>('/paciente/notificaciones');
+    return (response.data ?? []).whereType<Map<String, dynamic>>().toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getConsultations() async {
+    final response = await _dio.get<List<dynamic>>('/paciente/consultas');
+    return (response.data ?? []).whereType<Map<String, dynamic>>().toList();
+  }
+
+  Future<void> markNotificationRead(int id) async {
+    await _dio.post<void>('/paciente/notificaciones/$id/leer');
+  }
+
+  Future<void> markAllNotificationsRead() async {
+    await _dio.post<void>('/paciente/notificaciones/leer-todas');
+  }
+
+  Future<Map<String, dynamic>?> getSubscription() async {
+    final response =
+        await _dio.get<Map<String, dynamic>?>('/paciente/suscripcion');
+    return response.data;
+  }
+
+  Future<Map<String, dynamic>> createSubscription(String plan) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/paciente/suscripcion',
+      data: {'plan': plan},
+    );
+    return response.data ?? {};
+  }
+
+  Future<void> cancelSubscription() async {
+    await _dio.post<void>('/paciente/suscripcion/cancelar');
   }
 }
 

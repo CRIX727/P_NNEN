@@ -17,4 +17,3 @@ class AuthSession {
   final String accessToken;
   final String refreshToken;
 }
-

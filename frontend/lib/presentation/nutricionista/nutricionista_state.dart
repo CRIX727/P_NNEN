@@ -1,13 +1,17 @@
 import '../../domain/entities/cita_paciente.dart';
+import '../../domain/entities/alimento.dart';
+import '../../domain/entities/consulta.dart';
 import '../../domain/entities/documento_paciente.dart';
 import '../../domain/entities/evaluacion.dart';
 import '../../domain/entities/mensaje_paciente.dart';
 import '../../domain/entities/nutricionista_settings.dart';
+import '../../domain/entities/invitacion.dart';
 import '../../domain/entities/nutricionista_summary.dart';
 import '../../domain/entities/paciente.dart';
 import '../../domain/entities/pago_paciente.dart';
 import '../../domain/entities/plan_alimenticio.dart';
 import '../../domain/entities/plantilla_plan.dart';
+import '../../domain/entities/tarea_nutricionista.dart';
 
 enum NutricionistaSection {
   dashboard,
@@ -17,6 +21,7 @@ enum NutricionistaSection {
   agenda,
   comunicacion,
   pagos,
+  herramientas,
   configuracion,
 }
 
@@ -27,6 +32,7 @@ class NutricionistaState {
     this.message,
     this.summary,
     this.pacientes = const [],
+    this.invitations = const [],
     this.selectedPatient,
     this.evaluations = const [],
     this.plans = const [],
@@ -36,6 +42,9 @@ class NutricionistaState {
     this.documents = const [],
     this.templates = const [],
     this.settings,
+    this.foods = const [],
+    this.tasks = const [],
+    this.consultations = const [],
   });
 
   const NutricionistaState.initial()
@@ -44,6 +53,7 @@ class NutricionistaState {
         message = null,
         summary = null,
         pacientes = const [],
+        invitations = const [],
         selectedPatient = null,
         evaluations = const [],
         plans = const [],
@@ -52,13 +62,17 @@ class NutricionistaState {
         payments = const [],
         documents = const [],
         templates = const [],
-        settings = null;
+        settings = null,
+        foods = const [],
+        tasks = const [],
+        consultations = const [];
 
   final bool loading;
   final NutricionistaSection section;
   final String? message;
   final NutricionistaSummary? summary;
   final List<Paciente> pacientes;
+  final List<Invitacion> invitations;
   final Paciente? selectedPatient;
   final List<Evaluacion> evaluations;
   final List<PlanAlimenticio> plans;
@@ -68,6 +82,13 @@ class NutricionistaState {
   final List<DocumentoPaciente> documents;
   final List<PlantillaPlan> templates;
   final NutricionistaSettings? settings;
+  final List<Alimento> foods;
+  final List<TareaNutricionista> tasks;
+  final List<Consulta> consultations;
+
+  int get unreadMessages => messages
+      .where((item) => item.remitente == 'paciente' && !item.leido)
+      .length;
 
   NutricionistaState copyWith({
     bool? loading,
@@ -76,6 +97,7 @@ class NutricionistaState {
     bool clearMessage = false,
     NutricionistaSummary? summary,
     List<Paciente>? pacientes,
+    List<Invitacion>? invitations,
     Paciente? selectedPatient,
     List<Evaluacion>? evaluations,
     List<PlanAlimenticio>? plans,
@@ -85,6 +107,9 @@ class NutricionistaState {
     List<DocumentoPaciente>? documents,
     List<PlantillaPlan>? templates,
     NutricionistaSettings? settings,
+    List<Alimento>? foods,
+    List<TareaNutricionista>? tasks,
+    List<Consulta>? consultations,
   }) {
     return NutricionistaState(
       loading: loading ?? this.loading,
@@ -92,6 +117,7 @@ class NutricionistaState {
       message: clearMessage ? null : (message ?? this.message),
       summary: summary ?? this.summary,
       pacientes: pacientes ?? this.pacientes,
+      invitations: invitations ?? this.invitations,
       selectedPatient: selectedPatient ?? this.selectedPatient,
       evaluations: evaluations ?? this.evaluations,
       plans: plans ?? this.plans,
@@ -101,7 +127,9 @@ class NutricionistaState {
       documents: documents ?? this.documents,
       templates: templates ?? this.templates,
       settings: settings ?? this.settings,
+      foods: foods ?? this.foods,
+      tasks: tasks ?? this.tasks,
+      consultations: consultations ?? this.consultations,
     );
   }
 }
-

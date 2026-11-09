@@ -9,4 +9,3 @@ class LogoutUseCase {
     return _repository.logout();
   }
 }
-

@@ -24,86 +24,165 @@ enum PaymentStatus {
   PAGADO
 }
 
+enum InvitationStatus {
+  PENDIENTE
+  ACEPTADA
+  RECHAZADA
+}
+
 model User {
-  id                Int       @id @default(autoincrement())
-  nombre            String
-  correo            String    @unique
-  passwordHash      String
-  rol               UserRole
-  refreshTokenHash  String?
-  precioConsulta    Float?    @default(0)
-  whatsapp          String?   @default("")
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  patients          Patient[]
+  id               Int                @id @default(autoincrement())
+  nombre           String
+  correo           String             @unique
+  passwordHash     String
+  rol              UserRole
+  refreshTokenHash String?
+  precioConsulta   Float?             @default(0)
+  whatsapp         String?            @default("")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  patients         Patient[]          @relation("NutritionistPatients")
+  patientProfile   Patient?           @relation("PatientAccount")
+  sentInvitations  Invitation[]       @relation("NutritionistInvitations")
+  receivedInvites  Invitation[]       @relation("PatientInvitations")
+  tasks            NutritionistTask[]
+  changeLogs       ChangeLog[]
+  foods            Food[]
+  sessions         AuthSession[]
+  notifications    Notification[]
+  deviceTokens     DeviceToken[]
+}
+
+model AuthSession {
+  id           String    @id @default(uuid())
+  userId       Int
+  tokenHash    String
+  userAgent    String    @default("")
+  ipAddress    String    @default("")
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime  @default(now())
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model LoginAttempt {
+  key          String   @id
+  failures     Int      @default(0)
+  windowStart  DateTime @default(now())
+  blockedUntil DateTime?
+  updatedAt    DateTime @updatedAt
 }
 
 model Patient {
-  id               Int       @id @default(autoincrement())
-  nombre           String
-  correo           String
-  nutricionistaId   Int
-  peso             Float     @default(0)
-  altura           Float     @default(0)
-  grasaCorporal    Float     @default(0)
-  alergias         String    @default("")
-  enfermedades     String    @default("")
-  edad             Int       @default(30)
-  sexo             String    @default("Femenino")
-  factorActividad  Float     @default(1.2)
-  telefono         String    @default("")
-  notas            String    @default("")
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  evaluations      Evaluation[]
-  plans            Plan[]
-  appointments     Appointment[]
-  messages         Message[]
-  payments         Payment[]
-  documents        Document[]
-  nutricionista    User      @relation(fields: [nutricionistaId], references: [id], onDelete: Cascade)
+  id                     Int            @id @default(autoincrement())
+  nombre                 String
+  correo                 String
+  nutricionistaId        Int?
+  usuarioId              Int?           @unique
+  peso                   Float          @default(0)
+  altura                 Float          @default(0)
+  grasaCorporal          Float          @default(0)
+  alergias               String         @default("")
+  enfermedades           String         @default("")
+  edad                   Int            @default(30)
+  sexo                   String         @default("Femenino")
+  factorActividad        Float          @default(1.2)
+  telefono               String         @default("")
+  notas                  String         @default("")
+  motivoConsulta         String         @default("")
+  antecedentesFamiliares String         @default("")
+  historialMedico        String         @default("")
+  medicamentos           String         @default("")
+  habitosAlimenticios    String         @default("")
+  consumoAgua            String         @default("")
+  actividadFisica        String         @default("")
+  objetivos              String         @default("")
+  notasPrivadas          String         @default("")
+  cintura                Float          @default(0)
+  cadera                 Float          @default(0)
+  brazo                  Float          @default(0)
+  plieguesCutaneos       String         @default("")
+  porcentajeMusculo      Float          @default(0)
+  autorizacionEstado     String         @default("PENDIENTE")
+  autorizacionFecha      String         @default("")
+  autorizacionFirma      String         @default("")
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  evaluations            Evaluation[]
+  plans                  Plan[]
+  appointments           Appointment[]
+  messages               Message[]
+  payments               Payment[]
+  documents              Document[]
+  consultations          Consultation[]
+  subscription           PatientSubscription?
+  nutricionista          User?          @relation("NutritionistPatients", fields: [nutricionistaId], references: [id], onDelete: SetNull)
+  usuario                User?          @relation("PatientAccount", fields: [usuarioId], references: [id], onDelete: SetNull)
 }
 
 model Evaluation {
-  id          Int      @id @default(autoincrement())
-  pacienteId  Int
-  peso        Float
-  altura      Float
-  imc         Float
-  tmb         Float     @default(0)
-  get         Float     @default(0)
-  grasa       Float
-  fecha       String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  patient     Patient   @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  id                Int      @id @default(autoincrement())
+  pacienteId        Int
+  peso              Float
+  altura            Float
+  imc               Float
+  tmb               Float    @default(0)
+  get               Float    @default(0)
+  grasa             Float
+  cintura           Float    @default(0)
+  cadera            Float    @default(0)
+  brazo             Float    @default(0)
+  plieguesCutaneos  String   @default("")
+  porcentajeMusculo Float    @default(0)
+  fecha             String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  patient           Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
 }
 
 model Plan {
-  id              Int      @id @default(autoincrement())
-  pacienteId      Int
-  titulo          String   @default("Plan general")
-  descripcion     String
-  objetivo        String   @default("")
-  condicion       String   @default("")
-  plantillaNombre String   @default("")
-  fechaInicio     String
-  fechaFin        String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  patient         Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  id                   Int      @id @default(autoincrement())
+  pacienteId           Int
+  titulo               String   @default("Plan general")
+  descripcion          String
+  objetivo             String   @default("")
+  condicion            String   @default("")
+  plantillaNombre      String   @default("")
+  fechaInicio          String
+  fechaFin             String
+  comidas              String   @default("")
+  sustituciones        String   @default("")
+  calorias             Float    @default(0)
+  proteinas            Float    @default(0)
+  carbohidratos        Float    @default(0)
+  grasasMacros         Float    @default(0)
+  periodo              String   @default("Diario")
+  recordatorio24h      String   @default("")
+  listaCompras         String   @default("")
+  recetas              String   @default("")
+  distribucionCalorias String   @default("")
+  aguaRecomendada      Float    @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  patient              Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
 }
 
 model Appointment {
-  id                  Int               @id @default(autoincrement())
-  pacienteId          Int
-  fecha               String
-  motivo              String
-  estado              AppointmentStatus @default(AGENDADA)
-  canalRecordatorio   String           @default("WhatsApp y email")
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
-  patient             Patient          @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  id                Int               @id @default(autoincrement())
+  pacienteId        Int
+  fecha             String
+  motivo            String
+  estado            AppointmentStatus @default(AGENDADA)
+  canalRecordatorio String            @default("WhatsApp y email")
+  asistencia        String            @default("PENDIENTE")
+  notas             String            @default("")
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  patient           Patient           @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
 }
 
 model Message {
@@ -114,7 +193,38 @@ model Message {
   fecha      String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  leido      Boolean  @default(false)
+  leidoAt    DateTime?
+  entregado  Boolean  @default(false)
+  entregadoAt DateTime?
   patient    Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  tipo         String
+  titulo       String
+  contenido    String
+  leida        Boolean  @default(false)
+  programadaAt DateTime?
+  enviadaAt    DateTime?
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, leida, createdAt])
+}
+
+model DeviceToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  plataforma String  @default("android")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Payment {
@@ -141,6 +251,34 @@ model Document {
   patient    Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
 }
 
+model Consultation {
+  id         Int      @id @default(autoincrement())
+  pacienteId Int
+  fecha      String
+  motivo     String   @default("")
+  notas      String   @default("")
+  estado     String   @default("REALIZADA")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  patient    Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+
+  @@index([pacienteId, fecha])
+}
+
+model PatientSubscription {
+  id                Int      @id @default(autoincrement())
+  pacienteId        Int      @unique
+  plan              String
+  estado            String   @default("ACTIVA")
+  proveedor         String   @default("manual")
+  referenciaExterna String   @default("")
+  periodoInicio     DateTime @default(now())
+  periodoFin        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  patient           Patient  @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
 model PlanTemplate {
   id          Int      @id @default(autoincrement())
   nombre      String
@@ -149,4 +287,72 @@ model PlanTemplate {
   descripcion String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Invitation {
+  id                Int              @id @default(autoincrement())
+  nutricionistaId   Int
+  pacienteUsuarioId Int?
+  correo            String
+  estado            InvitationStatus @default(PENDIENTE)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  nutricionista     User             @relation("NutritionistInvitations", fields: [nutricionistaId], references: [id], onDelete: Cascade)
+  pacienteUsuario   User?            @relation("PatientInvitations", fields: [pacienteUsuarioId], references: [id], onDelete: Cascade)
+
+  @@index([correo, estado])
+  @@index([pacienteUsuarioId, estado])
+}
+
+model Food {
+  id              Int      @id @default(autoincrement())
+  nutritionistId  Int?
+  nombre          String
+  porcion         String
+  calorias        Float    @default(0)
+  proteinas       Float    @default(0)
+  carbohidratos   Float    @default(0)
+  grasas          Float    @default(0)
+  fibra           Float    @default(0)
+  sodio           Float    @default(0)
+  azucar          Float    @default(0)
+  micronutrientes String   @default("")
+  sustituciones   String   @default("")
+  condiciones     String   @default("")
+  favorito        Boolean  @default(false)
+  restringido     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  nutritionist    User?    @relation(fields: [nutritionistId], references: [id], onDelete: Cascade)
+
+  @@index([nutritionistId, nombre])
+}
+
+model NutritionistTask {
+  id             Int      @id @default(autoincrement())
+  nutritionistId Int
+  pacienteId     Int?
+  titulo         String
+  descripcion    String   @default("")
+  fechaLimite    String   @default("")
+  completada     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  nutritionist   User     @relation(fields: [nutritionistId], references: [id], onDelete: Cascade)
+
+  @@index([nutritionistId, completada])
+}
+
+model ChangeLog {
+  id             Int      @id @default(autoincrement())
+  nutritionistId Int
+  pacienteId     Int?
+  entidad        String
+  entidadId      Int?
+  accion         String
+  descripcion    String
+  createdAt      DateTime @default(now())
+  nutritionist   User     @relation(fields: [nutritionistId], references: [id], onDelete: Cascade)
+
+  @@index([nutritionistId, createdAt])
 }

@@ -20,4 +20,3 @@ class PagoPaciente {
   final String fecha;
   final PagoEstado estado;
 }
-

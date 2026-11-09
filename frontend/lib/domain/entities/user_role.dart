@@ -2,4 +2,3 @@ enum UserRole {
   nutricionista,
   paciente,
 }
-

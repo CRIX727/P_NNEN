@@ -1,12 +1,22 @@
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.set('trust proxy', 1);
+  app.use(helmet());
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
 
+  const allowedOrigins = (process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: process.env.FRONTEND_ORIGIN ?? true,
+    origin: allowedOrigins,
     credentials: true,
   });
 
@@ -26,7 +36,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(Number(process.env.PORT ?? 3000), '0.0.0.0');
 }
 
 bootstrap();

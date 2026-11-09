@@ -13,4 +13,3 @@ class Usuario {
   final String correo;
   final UserRole rol;
 }
-

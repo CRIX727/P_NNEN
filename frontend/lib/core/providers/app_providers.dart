@@ -6,11 +6,14 @@ import '../../data/remote/auth_api.dart';
 import '../../data/remote/chat_socket_service.dart';
 import '../../data/remote/nutritionist_api.dart';
 import '../../data/remote/patient_api.dart';
+import '../../data/remote/device_api.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/nutritionist_repository.dart';
 import '../../data/repositories/nutritionist_repository_impl.dart';
+import '../../data/repositories/offline_nutritionist_repository.dart';
 import '../../data/repositories/patient_repository.dart';
 import '../../data/repositories/patient_repository_impl.dart';
+import '../../data/repositories/offline_patient_repository.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/load_session_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
@@ -21,6 +24,10 @@ import '../../presentation/auth/auth_controller.dart';
 import '../../presentation/nutricionista/nutricionista_controller.dart';
 import '../../presentation/paciente/paciente_controller.dart';
 import '../services/session_manager.dart';
+import '../services/push_notification_service.dart';
+import '../../data/local/local_database.dart';
+import '../../data/sync/network_monitor.dart';
+import '../../data/sync/sync_manager.dart';
 
 final sessionManagerProvider = Provider<SessionManager>((ref) {
   return SessionManager();
@@ -28,6 +35,18 @@ final sessionManagerProvider = Provider<SessionManager>((ref) {
 
 final dioProvider = Provider<Dio>((ref) {
   return ApiClient.create(ref.watch(sessionManagerProvider));
+});
+
+final pushNotificationServiceProvider =
+    Provider<PushNotificationService>((ref) {
+  return PushNotificationService(DeviceApi(ref.watch(dioProvider)));
+});
+
+final pushRegistrationProvider = Provider<void>((ref) {
+  final session = ref.watch(authControllerProvider).state.session;
+  if (session != null) {
+    ref.read(pushNotificationServiceProvider).initialize();
+  }
 });
 
 final authApiProvider = Provider<AuthApi>((ref) {
@@ -77,11 +96,46 @@ final nutritionistApiProvider = Provider<NutritionistApi>((ref) {
   return NutritionistApi(ref.watch(dioProvider));
 });
 
-final nutritionistRepositoryProvider = Provider<NutritionistRepository>((ref) {
+final localDatabaseProvider = Provider<LocalDatabase>((ref) {
+  final database = LocalDatabase();
+  ref.onDispose(database.close);
+  return database;
+});
+
+final networkMonitorProvider = Provider<NetworkMonitor>((ref) {
+  final monitor = NetworkMonitor();
+  ref.onDispose(monitor.dispose);
+  return monitor;
+});
+
+final syncManagerProvider = Provider<SyncManager>((ref) {
+  final manager = SyncManager(
+    ref.watch(dioProvider),
+    ref.watch(localDatabaseProvider),
+    ref.watch(networkMonitorProvider),
+  );
+  manager.start();
+  ref.onDispose(manager.dispose);
+  return manager;
+});
+
+final remoteNutritionistRepositoryProvider =
+    Provider<NutritionistRepositoryImpl>((ref) {
   return NutritionistRepositoryImpl(ref.watch(nutritionistApiProvider));
 });
 
-final nutritionistControllerProvider = ChangeNotifierProvider<NutricionistaController>((ref) {
+final nutritionistRepositoryProvider = Provider<NutritionistRepository>((ref) {
+  final session = ref.watch(authControllerProvider).state.session;
+  return OfflineNutritionistRepository(
+    remote: ref.watch(remoteNutritionistRepositoryProvider),
+    database: ref.watch(localDatabaseProvider),
+    sync: ref.watch(syncManagerProvider),
+    ownerKey: session?.email ?? 'anonymous',
+  );
+});
+
+final nutritionistControllerProvider =
+    ChangeNotifierProvider<NutricionistaController>((ref) {
   final controller = NutricionistaController(
     ref.watch(nutritionistRepositoryProvider),
     ref.watch(chatSocketServiceProvider),
@@ -100,11 +154,22 @@ final chatSocketServiceProvider = Provider<ChatSocketService>((ref) {
   return service;
 });
 
-final patientRepositoryProvider = Provider<PatientRepository>((ref) {
+final remotePatientRepositoryProvider = Provider<PatientRepository>((ref) {
   return PatientRepositoryImpl(ref.watch(patientApiProvider));
 });
 
-final patientControllerProvider = ChangeNotifierProvider<PacienteController>((ref) {
+final patientRepositoryProvider = Provider<PatientRepository>((ref) {
+  final session = ref.watch(authControllerProvider).state.session;
+  return OfflinePatientRepository(
+    remote: ref.watch(remotePatientRepositoryProvider),
+    database: ref.watch(localDatabaseProvider),
+    sync: ref.watch(syncManagerProvider),
+    ownerKey: session?.email ?? 'anonymous',
+  );
+});
+
+final patientControllerProvider =
+    ChangeNotifierProvider<PacienteController>((ref) {
   return PacienteController(
     ref.watch(patientRepositoryProvider),
     ref.watch(chatSocketServiceProvider),

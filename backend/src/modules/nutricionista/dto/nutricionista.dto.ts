@@ -1,4 +1,4 @@
-import { IsDateString, IsIn, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsDateString, IsEmail, IsIn, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreatePatientDto {
   @IsString()
@@ -36,6 +36,24 @@ export class CreatePatientDto {
 
   @IsString()
   notas!: string;
+
+  @IsOptional() @IsString() motivoConsulta?: string;
+  @IsOptional() @IsString() antecedentesFamiliares?: string;
+  @IsOptional() @IsString() historialMedico?: string;
+  @IsOptional() @IsString() medicamentos?: string;
+  @IsOptional() @IsString() habitosAlimenticios?: string;
+  @IsOptional() @IsString() consumoAgua?: string;
+  @IsOptional() @IsString() actividadFisica?: string;
+  @IsOptional() @IsString() objetivos?: string;
+  @IsOptional() @IsString() notasPrivadas?: string;
+  @IsOptional() @IsNumber() cintura?: number;
+  @IsOptional() @IsNumber() cadera?: number;
+  @IsOptional() @IsNumber() brazo?: number;
+  @IsOptional() @IsString() plieguesCutaneos?: string;
+  @IsOptional() @IsNumber() porcentajeMusculo?: number;
+  @IsOptional() @IsString() autorizacionEstado?: string;
+  @IsOptional() @IsString() autorizacionFecha?: string;
+  @IsOptional() @IsString() autorizacionFirma?: string;
 }
 
 export class UpdatePatientDto extends CreatePatientDto {}
@@ -52,7 +70,15 @@ export class CreateEvaluationDto {
 
   @IsString()
   fecha!: string;
+
+  @IsOptional() @IsNumber() cintura?: number;
+  @IsOptional() @IsNumber() cadera?: number;
+  @IsOptional() @IsNumber() brazo?: number;
+  @IsOptional() @IsString() plieguesCutaneos?: string;
+  @IsOptional() @IsNumber() porcentajeMusculo?: number;
 }
+
+export class UpdateEvaluationDto extends CreateEvaluationDto {}
 
 export class CreatePlanDto {
   @IsString()
@@ -75,6 +101,19 @@ export class CreatePlanDto {
 
   @IsString()
   fechaFin!: string;
+
+  @IsOptional() @IsString() comidas?: string;
+  @IsOptional() @IsString() sustituciones?: string;
+  @IsOptional() @IsNumber() calorias?: number;
+  @IsOptional() @IsNumber() proteinas?: number;
+  @IsOptional() @IsNumber() carbohidratos?: number;
+  @IsOptional() @IsNumber() grasasMacros?: number;
+  @IsOptional() @IsString() periodo?: string;
+  @IsOptional() @IsString() recordatorio24h?: string;
+  @IsOptional() @IsString() listaCompras?: string;
+  @IsOptional() @IsString() recetas?: string;
+  @IsOptional() @IsString() distribucionCalorias?: string;
+  @IsOptional() @IsNumber() aguaRecomendada?: number;
 }
 
 export class CreateAppointmentDto {
@@ -89,6 +128,9 @@ export class CreateAppointmentDto {
 
   @IsString()
   canalRecordatorio!: string;
+
+  @IsOptional() @IsString() asistencia?: string;
+  @IsOptional() @IsString() notas?: string;
 }
 
 export class CreateMessageDto {
@@ -152,5 +194,42 @@ export class UpdateSettingsDto {
   @IsOptional()
   @IsString()
   whatsapp?: string;
+}
+
+export class CreateInvitationDto {
+  @IsEmail({}, { message: 'El correo del paciente no es válido' })
+  correo!: string;
+}
+
+export class CreateFoodDto {
+  @IsString() nombre!: string;
+  @IsString() porcion!: string;
+  @IsNumber() calorias!: number;
+  @IsNumber() proteinas!: number;
+  @IsNumber() carbohidratos!: number;
+  @IsNumber() grasas!: number;
+  @IsOptional() @IsNumber() fibra?: number;
+  @IsOptional() @IsNumber() sodio?: number;
+  @IsOptional() @IsNumber() azucar?: number;
+  @IsOptional() @IsString() micronutrientes?: string;
+  @IsOptional() @IsString() sustituciones?: string;
+  @IsOptional() @IsString() condiciones?: string;
+  @IsOptional() favorito?: boolean;
+  @IsOptional() restringido?: boolean;
+}
+
+export class CreateTaskDto {
+  @IsString() titulo!: string;
+  @IsOptional() @IsString() descripcion?: string;
+  @IsOptional() @IsString() fechaLimite?: string;
+  @IsOptional() @IsNumber() pacienteId?: number;
+  @IsOptional() completada?: boolean;
+}
+
+export class CreateConsultationDto {
+  @IsString() fecha!: string;
+  @IsOptional() @IsString() motivo?: string;
+  @IsOptional() @IsString() notas?: string;
+  @IsOptional() @IsString() estado?: string;
 }
 

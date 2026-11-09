@@ -1,0 +1,6 @@
+# Copia este archivo como key.properties y completa los valores localmente.
+# Nunca subas key.properties ni el archivo .jks al repositorio.
+storePassword=REPLACE_ME
+keyPassword=REPLACE_ME
+keyAlias=nnen
+storeFile=C:/ruta/segura/nnen-upload-key.jks
